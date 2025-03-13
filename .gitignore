@@ -1,0 +1,29 @@
+# Models
+models/*
+
+# Build artifacts
+build/
+*.bin
+*.o
+*.obj
+*.exe
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Submodule internal files (optional)
+llama.cpp/build/
+llama.cpp/models/
