@@ -15,7 +15,7 @@ RUN pip install numpy && \
 WORKDIR /app
 RUN git clone https://github.com/ggerganov/llama.cpp && \
     cd llama.cpp && mkdir build && cd build && \
-    cmake .. -DLLAMA_CUBLAS=ON && make -j4
+    cmake .. -DGGML_CUDA=ON && make -j4
 
 # Copy application source code and build the application
 COPY . /app/src
