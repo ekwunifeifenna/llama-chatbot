@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: ai-chat-service
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: API_KEY
+        generateValue: true
+      - key: CLIENT_URL
+        value: "https://harmonykloud.com"
+    autoDeploy: true

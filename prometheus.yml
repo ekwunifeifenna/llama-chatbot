@@ -1,0 +1,24 @@
+# Global configuration
+global:
+  # Set the default scrape interval to 15 seconds
+  scrape_interval: 15s
+
+# Scrape configuration for the chatbot service
+scrape_configs:
+  - job_name: 'chatbot'
+    # Path to scrape metrics from
+    metrics_path: '/metrics'
+    # Static configuration for the chatbot target
+    static_configs:
+      - targets: ['chatbot:8080']
+    # Relabeling configuration
+    relabel_configs:
+      # Relabel the source address to the __param_target label
+      - source_labels: [__address__]
+        target_label: __param_target
+      # Relabel the __param_target label to the instance label
+      - source_labels: [__param_target]
+        target_label: instance
+      # Set the address to scrape metrics from
+      - target_label: __address__
+        replacement: prometheus:9090

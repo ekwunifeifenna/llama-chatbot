@@ -1,7 +1,35 @@
 cmake_minimum_required(VERSION 3.15)
 project(chatbot LANGUAGES C CXX)
 
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 add_subdirectory(llama.cpp)
 
-add_executable(chat src/chat.cpp)
-target_link_libraries(chat PRIVATE llama)
+find_package(yaml-cpp REQUIRED)
+find_package(PrometheusCpp REQUIRED)
+
+include(FetchContent)
+FetchContent_Declare(
+    crow
+    GIT_REPOSITORY https://github.com/CrowCpp/Crow.git
+    GIT_TAG v1.0+5
+)
+FetchContent_MakeAvailable(crow)
+
+add_executable(chatbot
+    src/chat.cpp
+)
+
+target_include_directories(chatbot PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/llama.cpp
+)
+
+target_link_libraries(chatbot PRIVATE
+    llama
+    crow::crow
+    yaml-cpp
+    prometheus-cpp::core
+    prometheus-cpp::pull
+    pthread
+)

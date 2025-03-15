@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  chatbot:
+    # Build the Docker image from the Dockerfile in the current directory
+    build: .
+    
+    # Map port 8080 on the host to port 8080 in the container
+    ports:
+      - "8080:8080"
+    
+    # Set environment variables for the container
+    environment:
+      - CONFIG_PATH=/app/config.yaml
+    
+    # Mount the host directory ./models to /app/models in the container
+    volumes:
+      - ./models:/app/models
+    
+    # Deployment configuration
+    deploy:
+      resources:
+        reservations:
+          devices:
+            # Reserve one NVIDIA GPU for the container
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  prometheus:
+    # Use the official Prometheus image
+    image: prom/prometheus
+    
+    # Map port 9090 on the host to port 9090 in the container
+    ports:
+      - "9090:9090"
+    
+    # Mount the Prometheus configuration file
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  grafana:
+    # Use the official Grafana image
+    image: grafana/grafana
+    
+    # Map port 3000 on the host to port 3000 in the container
+    ports:
+      - "3000:3000"
+    
+    # Mount a volume for persistent storage of Grafana data
+    volumes:
+      - grafana-storage:/var/lib/grafana
+
+# Define named volumes for persistent storage
+volumes:
+  grafana-storage:

@@ -1,3 +1,4 @@
+### Original Entries (Good to Keep) ###
 # Models
 models/*
 
@@ -24,6 +25,77 @@ install_manifest.txt
 .DS_Store
 Thumbs.db
 
-# Submodule internal files (optional)
+# Submodule internal files
 llama.cpp/build/
 llama.cpp/models/
+
+# Secrets
+config.yaml
+.env
+*.gguf
+
+### Additional Recommendations ###
+# Compiled libraries
+*.a
+*.so
+*.dylib
+*.dll
+*.lib
+
+# Dependency directories
+deps/
+_deps/
+vcpkg_installed/
+conanbuildinfo/
+
+# IDE-specific (expanded)
+*.sublime-workspace
+*.kdev4
+*.komodoproject
+
+# Build directories from different systems
+_build/
+out/
+dist/
+bin/
+lib/
+obj/
+x64/
+x86/
+Debug/
+Release/
+cmake-build-*/
+
+# Dependency files
+*.d
+.depend/
+
+# Logs and databases
+*.log
+logs/
+*.sqlite
+*.sqlite3
+
+# Testing
+.coverage
+*.gcno
+*.gcda
+
+# Documentation
+docs/_build/
+docs/html/
+docs/latex/
+
+# Package managers
+venv/
+.venv/
+poetry.lock
+Pipfile.lock
+
+# Misc
+*.user
+*.cache
+*.prof
+tags
+GTAGS
+compile_commands.json
