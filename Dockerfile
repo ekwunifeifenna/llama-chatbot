@@ -1,5 +1,5 @@
 # Build stage
-FROM nvidia/cuda:12.2.0-devel-ubuntu22.04 as builder
+FROM nvidia/cuda:12.2.0-devel-ubuntu22.04 AS builder
 
 # Install build dependencies
 RUN apt-get update && \
@@ -10,7 +10,9 @@ RUN apt-get update && \
     wget \
     python3-pip \
     libyaml-cpp-dev \
-    libprometheus-cpp-dev
+    libprometheus-dev && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
 RUN pip install numpy
@@ -31,7 +33,7 @@ ENV LIBRARY_PATH=/usr/local/cuda/lib64/stubs:$LIBRARY_PATH
 RUN git clone https://github.com/ggerganov/llama.cpp && \
     cd llama.cpp && mkdir build && cd build && \
     cmake .. -DGGML_CUDA=ON && \
-    make -j4
+    make -j$(nproc)
 
 # Build your application
 COPY . /app/src
@@ -41,7 +43,7 @@ RUN cmake .. && cmake --build .
 # Runtime stage
 FROM nvidia/cuda:12.2.0-base-ubuntu22.04
 
-# Install runtime dependencies (Prometheus package removed)
+# Install runtime dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libstdc++6 \
