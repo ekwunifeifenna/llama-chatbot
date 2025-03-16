@@ -41,12 +41,12 @@ RUN cmake .. && cmake --build .
 # Runtime stage
 FROM nvidia/cuda:12.2.0-base-ubuntu22.04
 
-# Install runtime dependencies (CORRECTED)
+# Install runtime dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libstdc++6 \
     libyaml-cpp0.7 \
-    libprometheus-cpp1.0 && \ 
+    libprometheus-cpp0.13 && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy built artifacts
