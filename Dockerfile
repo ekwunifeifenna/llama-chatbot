@@ -10,7 +10,7 @@ RUN apt-get update && \
     wget \
     python3-pip \
     libyaml-cpp-dev \
-    libprometheus-dev && \
+    libprometheus-cpp-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
