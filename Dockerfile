@@ -1,7 +1,7 @@
 # Build stage
 FROM nvidia/cuda:12.2.0-devel-ubuntu22.04 as builder
 
-# Install build dependencies including Prometheus client
+# Install build dependencies
 RUN apt-get update && \
     apt-get install -y \
     build-essential \
@@ -41,12 +41,12 @@ RUN cmake .. && cmake --build .
 # Runtime stage
 FROM nvidia/cuda:12.2.0-base-ubuntu22.04
 
-# Install runtime dependencies (FINAL CORRECTED PACKAGE)
+# Install runtime dependencies (CORRECTED)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libstdc++6 \
     libyaml-cpp0.7 \
-    libprometheus-cpp0.13 && \  
+    libprometheus-cpp1.0 && \ 
     rm -rf /var/lib/apt/lists/*
 
 # Copy built artifacts
