@@ -10,7 +10,7 @@ RUN apt-get update && \
     wget \
     python3-pip \
     libyaml-cpp-dev \
-    libprometheus-cpp-dev  # Added Prometheus C++ client
+    libprometheus-cpp-dev  # Development headers
 
 # Install Python dependencies
 RUN pip install numpy
@@ -41,12 +41,12 @@ RUN cmake .. && cmake --build .
 # Runtime stage
 FROM nvidia/cuda:12.2.0-base-ubuntu22.04
 
-# Install runtime dependencies
+# Install runtime dependencies (CORRECTED PACKAGE NAME)
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libstdc++6 \
     libyaml-cpp0.7 \
-    libprometheus-cpp1  # Added Prometheus runtime library && \
+    libprometheus-cpp0.13-0 && \  # Updated package name for Ubuntu 22.04
     rm -rf /var/lib/apt/lists/*
 
 # Copy built artifacts
