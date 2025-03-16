@@ -1,9 +1,16 @@
 # Build stage
 FROM nvidia/cuda:12.2.0-devel-ubuntu22.04 as builder
 
-# Install build dependencies
+# Install build dependencies including Prometheus client
 RUN apt-get update && \
-    apt-get install -y build-essential cmake git wget python3-pip libyaml-cpp-dev
+    apt-get install -y \
+    build-essential \
+    cmake \
+    git \
+    wget \
+    python3-pip \
+    libyaml-cpp-dev \
+    libprometheus-cpp-dev  # Added Prometheus C++ client
 
 # Install Python dependencies
 RUN pip install numpy
@@ -36,7 +43,10 @@ FROM nvidia/cuda:12.2.0-base-ubuntu22.04
 
 # Install runtime dependencies
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends libstdc++6 libyaml-cpp0.7 && \
+    apt-get install -y --no-install-recommends \
+    libstdc++6 \
+    libyaml-cpp0.7 \
+    libprometheus-cpp1  # Added Prometheus runtime library && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy built artifacts
