@@ -46,7 +46,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libstdc++6 \
     libyaml-cpp0.7 \
-    libprometheus-cpp0.13-0 && \  # Updated package name for Ubuntu 22.04
+    libprometheus-cpp0.13-0 &&\
     rm -rf /var/lib/apt/lists/*
 
 # Copy built artifacts
