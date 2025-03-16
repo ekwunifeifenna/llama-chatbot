@@ -13,9 +13,16 @@ RUN pip install numpy && \
 
 # Set working directory and clone llama.cpp repository
 WORKDIR /app
+
+# Add CUDA stub library path for linking
+ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:$LD_LIBRARY_PATH
+ENV LIBRARY_PATH=/usr/local/cuda/lib64/stubs:$LIBRARY_PATH
+
+# Build llama.cpp with CUDA support
 RUN git clone https://github.com/ggerganov/llama.cpp && \
     cd llama.cpp && mkdir build && cd build && \
-    cmake .. -DGGML_CUDA=ON && make -j4
+    cmake .. -DGGML_CUDA=ON && \
+    make -j4
 
 # Copy application source code and build the application
 COPY . /app/src
