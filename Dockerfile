@@ -10,7 +10,7 @@ RUN apt-get update && \
     wget \
     python3-pip \
     libyaml-cpp-dev \
-    libprometheus-cpp-dev
+    libprometheus-cpp-dev  # Development package name
 
 # Install Python dependencies
 RUN pip install numpy
@@ -46,7 +46,7 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libstdc++6 \
     libyaml-cpp0.7 \
-    libprometheus-cpp0.13 && \  
+    libprometheus-cpp0.13v5 && \  
     rm -rf /var/lib/apt/lists/*
 
 # Copy built artifacts
