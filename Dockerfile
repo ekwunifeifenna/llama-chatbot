@@ -97,6 +97,9 @@ RUN apt-get update && \
     python3-pip \
     libyaml-cpp-dev \
     zlib1g-dev \
+    libboost-dev \
+    libboost-system-dev \
+    libboost-date-time-dev \
     nlohmann-json3-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
