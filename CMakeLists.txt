@@ -8,8 +8,10 @@ add_subdirectory(llama.cpp)
 
 find_package(yaml-cpp REQUIRED)
 
+list(APPEND CMAKE_PREFIX_PATH "/usr/local/lib/cmake/PrometheusCpp")
 list(APPEND CMAKE_PREFIX_PATH "/usr/local")
-find_package(PrometheusCpp REQUIRED)
+
+find_package(PrometheusCpp REQUIRED COMPONENTS core pull)
 
 include(FetchContent)
 FetchContent_Declare(
