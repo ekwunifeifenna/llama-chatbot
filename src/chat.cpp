@@ -8,8 +8,8 @@
 #include <atomic>
 #include <sstream>
 #include <csignal>
-#include <prometheus/exposer.h>
-#include <prometheus/registry.h>
+// #include <prometheus/exposer.h>
+// #include <prometheus/registry.h>
 
 using namespace std::chrono;
 using json = nlohmann::json;
@@ -35,20 +35,20 @@ struct Session {
 std::mutex g_mutex;
 std::unordered_map<std::string, Session> g_sessions;
 
-class Metrics {
-public:
-    prometheus::Family<prometheus::Counter>& requests = prometheus::BuildCounter()
-        .Name("http_requests_total")
-        .Help("Total HTTP Requests")
-        .Register(*registry);
+// class Metrics {
+// public:
+//     prometheus::Family<prometheus::Counter>& requests = prometheus::BuildCounter()
+//         .Name("http_requests_total")
+//         .Help("Total HTTP Requests")
+//         .Register(*registry);
 
-    prometheus::Family<prometheus::Gauge>& active_sessions = prometheus::BuildGauge()
-        .Name("active_sessions")
-        .Help("Currently Active Sessions")
-        .Register(*registry);
+//     prometheus::Family<prometheus::Gauge>& active_sessions = prometheus::BuildGauge()
+//         .Name("active_sessions")
+//         .Help("Currently Active Sessions")
+//         .Register(*registry);
 
-    std::shared_ptr<prometheus::Registry> registry = std::make_shared<prometheus::Registry>();
-} g_metrics;
+//     std::shared_ptr<prometheus::Registry> registry = std::make_shared<prometheus::Registry>();
+// } g_metrics;
 
 Config load_config(const std::string& path) {
     YAML::Node config = YAML::LoadFile(path);
@@ -165,14 +165,14 @@ int main(int argc, char** argv) {
 
     CROW_ROUTE(app, "/health")([]{ return crow::response(200); });
 
-    CROW_ROUTE(app, "/metrics")([]{
-        return crow::response(prometheus::TextSerializer().Serialize(g_metrics.registry->Collect()));
-    });
+    // CROW_ROUTE(app, "/metrics")([]{
+    //     return crow::response(prometheus::TextSerializer().Serialize(g_metrics.registry->Collect()));
+    // });
 
     CROW_ROUTE(app, "/chat")
         .CROW_MIDDLEWARES(app, AuthMiddleware)
         .methods("POST"_method)([&](const crow::request& req){
-            g_metrics.requests.Add({}).Increment();
+            // g_metrics.requests.Add({}).Increment();
             json response;
             try {
                 auto data = json::parse(req.body);
