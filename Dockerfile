@@ -87,9 +87,9 @@
 # Build stage
 FROM nvidia/cuda:12.2.0-devel-ubuntu22.04 AS builder
 
-# Install build dependencies
+# Install build dependencies with cleanup
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
     git \
@@ -100,47 +100,43 @@ RUN apt-get update && \
     libboost-dev \
     libboost-system-dev \
     libboost-date-time-dev \
-    nlohmann-json3-dev && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    nlohmann-json3-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-RUN pip install numpy
+# Install Python dependencies with cache
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install numpy
 
-# Set working directory
-WORKDIR /app
-
-# Configure CUDA stub libraries
+# Configure CUDA environment
 RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/libcuda.so.1 && \
     echo "/usr/local/cuda/lib64/stubs" > /etc/ld.so.conf.d/cuda-stubs.conf && \
     ldconfig
 
-# Set environment variables
-ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64/stubs:$LD_LIBRARY_PATH
-ENV LIBRARY_PATH=/usr/local/cuda/lib64/stubs:$LIBRARY_PATH
-
-# Clone and build llama.cpp
+# Build llama.cpp with CUDA support
 RUN git clone https://github.com/ggerganov/llama.cpp && \
-    cd llama.cpp && mkdir build && cd build && \
+    cd llama.cpp && \
+    mkdir build && cd build && \
     cmake .. -DGGML_CUDA=ON && \
     make -j$(nproc)
 
-# Build application
-COPY . /app/src
-WORKDIR /app/src/build
-RUN cmake .. && \
+# Copy application and build
+WORKDIR /app
+COPY . src/
+RUN mkdir -p src/build && \
+    cd src/build && \
+    cmake .. && \
     cmake --build . -- -j$(nproc)
 
 # Runtime stage
 FROM nvidia/cuda:12.2.0-base-ubuntu22.04
 
-# Runtime dependencies
+# Install runtime dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     libstdc++6 \
     libyaml-cpp0.7 \
-    zlib1g && \
-    rm -rf /var/lib/apt/lists/*
+    zlib1g \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy artifacts
 COPY --from=builder /app/src/build/chatbot /app/chatbot
