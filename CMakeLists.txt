@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_subdirectory(llama.cpp)
 
 find_package(yaml-cpp REQUIRED)
+
+list(APPEND CMAKE_PREFIX_PATH "/usr/local")
 find_package(PrometheusCpp REQUIRED)
 
 include(FetchContent)

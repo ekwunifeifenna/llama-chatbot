@@ -10,9 +10,21 @@ RUN apt-get update && \
     wget \
     python3-pip \
     libyaml-cpp-dev \
-    libprometheus-cpp-dev && \
+    libcurl4-openssl-dev \
+    zlib1g-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Install Prometheus C++ client from source
+RUN git clone https://github.com/jupp0r/prometheus-cpp.git && \
+    cd prometheus-cpp && \
+    git submodule init && \
+    git submodule update && \
+    mkdir build && \
+    cd build && \
+    cmake .. -DBUILD_SHARED_LIBS=ON && \
+    make -j$(nproc) && \
+    make install
 
 # Install Python dependencies
 RUN pip install numpy
