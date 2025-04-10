@@ -1,11 +1,15 @@
 services:
   - type: web
-    name: ai-chat-service
+    # name: ai-chat-service
+    name: llama-chatbot
     plan: free
     dockerfilePath: ./Dockerfile
     envVars:
       - key: API_KEY
         generateValue: true
-      - key: CLIENT_URL
-        value: "https://harmonykloud.com"
-    autoDeploy: true
+      - key: CORS_ALLOWED_ORIGINS
+        value: "https://harmonykloud.com, http://localhost:5173, http://localhost:3000, http://staging.harmonykloud.com"
+    disk:
+      name: models
+      mountPath: /app/models
+      sizeGB: 1  # Max for free tier

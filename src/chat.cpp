@@ -137,7 +137,8 @@ public:
 };
 
 int main(int argc, char** argv) {
-    g_config = load_config("/app/config.yaml");
+    // g_config = load_config("/app/config.yaml");
+    g_config = load_config("config.yaml");
     ChatProcessor processor(g_config);
 
     crow::SimpleApp app;
@@ -169,40 +170,71 @@ int main(int argc, char** argv) {
     //     return crow::response(prometheus::TextSerializer().Serialize(g_metrics.registry->Collect()));
     // });
 
-    CROW_ROUTE(app, "/chat")
-        .CROW_MIDDLEWARES(app, AuthMiddleware)
-        .methods("POST"_method)([&](const crow::request& req){
-            // g_metrics.requests.Add({}).Increment();
-            json response;
-            try {
-                auto data = json::parse(req.body);
-                std::string session_id = data["session_id"];
-                std::string message = data.value("message", "");
+    // CROW_ROUTE(app, "/chat")
+    //     .CROW_MIDDLEWARES(app, AuthMiddleware)
+    //     .methods("POST"_method)([&](const crow::request& req){
+    //         // g_metrics.requests.Add({}).Increment();
+    //         json response;
+    //         try {
+    //             auto data = json::parse(req.body);
+    //             std::string session_id = data["session_id"];
+    //             std::string message = data.value("message", "");
 
-                std::lock_guard<std::mutex> lock(g_mutex);
-                auto& session = g_sessions[session_id];
+    //             std::lock_guard<std::mutex> lock(g_mutex);
+    //             auto& session = g_sessions[session_id];
                 
-                if (session.request_count++ > g_config.rate_limit) {
-                    return crow::response(429, {{"error", "Rate limit exceeded"}});
-                }
-                session.last_active = steady_clock::now();
+    //             if (session.request_count++ > g_config.rate_limit) {
+    //                 return crow::response(429, {{"error", "Rate limit exceeded"}});
+    //             }
+    //             session.last_active = steady_clock::now();
 
-                std::string assistant_response = processor.process_message(message, session.history);
-                size_t pos = assistant_response.find("</s>");
-                if (pos != std::string::npos) assistant_response.erase(pos);
+    //             std::string assistant_response = processor.process_message(message, session.history);
+    //             size_t pos = assistant_response.find("</s>");
+    //             if (pos != std::string::npos) assistant_response.erase(pos);
 
-                response = {
-                    {"response", assistant_response},
-                    {"session_id", session_id},
-                    {"tokens_used", session.history.size()}
-                };
-            }
-            catch (const std::exception& e) {
-                response["error"] = e.what();
-                return crow::response(500, response);
-            }
-            return crow::response(response);
-        });
+    //             response = {
+    //                 {"response", assistant_response},
+    //                 {"session_id", session_id},
+    //                 {"tokens_used", session.history.size()}
+    //             };
+    //         }
+    //         catch (const std::exception& e) {
+    //             response["error"] = e.what();
+    //             return crow::response(500, response);
+    //         }
+    //         return crow::response(response);
+    //     });
+    CROW_ROUTE(app, "/chat")
+    .methods("POST"_method)([&](const crow::request& req){
+        // API Key validation
+        const auto& api_key = req.get_header_value("X-API-Key");
+        if(api_key != std::getenv("CHATBOT_API_KEY")) {
+            return crow::response(401, {{"error", "Invalid API key"}});
+        }
+    
+        // Process request
+        auto data = json::parse(req.body);
+        std::string message = data.value("message", "");
+        std::string session_id = data.value("session_id", "default");
+    
+        std::lock_guard<std::mutex> lock(g_mutex);
+        auto& session = g_sessions[session_id];
+        
+        // Rate limiting
+        if (session.request_count++ > 100) {
+            return crow::response(429, {{"error", "Rate limit exceeded"}});
+        }
+    
+        // Generate response
+        std::string response_text = processor.process_message(message, session.history);
+        
+        // Format response for Express compatibility
+        return crow::response(json{
+            {"text", response_text},
+            {"buttons", json::array()},
+            {"showOptions", true}
+        }.dump());
+    });
 
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);

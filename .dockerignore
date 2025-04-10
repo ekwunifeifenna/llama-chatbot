@@ -1,0 +1,3 @@
+models/
+!models/download_model.sh
+!models/mistral-7b-instruct.Q4_K_M.gguf
