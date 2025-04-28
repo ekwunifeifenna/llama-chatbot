@@ -45,12 +45,11 @@ project(chatbot LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Add llama.cpp
-add_subdirectory(llama.cpp)
+# Add llama.cpp with updated build flags
+add_subdirectory(llama.cpp EXCLUDE_FROM_ALL)
 
 find_package(yaml-cpp REQUIRED)
 
-# Crow setup
 include(FetchContent)
 FetchContent_Declare(
     crow
@@ -59,11 +58,11 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(crow)
 
-# Executable
 add_executable(chatbot src/chat.cpp)
 
 target_include_directories(chatbot PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/llama.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/llama.cpp/src
 )
 
 target_link_libraries(chatbot PRIVATE
@@ -71,4 +70,11 @@ target_link_libraries(chatbot PRIVATE
     Crow::Crow
     yaml-cpp
     pthread
+    ${CMAKE_DL_LIBS}
+)
+
+# New required link libraries
+target_link_libraries(chatbot PRIVATE
+    ggml_shared
+    llama_common
 )
